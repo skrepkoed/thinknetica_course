@@ -1,66 +1,67 @@
 # frozen_string_literal: true
 
 class Triangle
-  attr_accessor :a, :b, :c
+  attr_reader :a, :b, :c
 
   def self.get_lengths
     print 'Введите длинну а:'
-
-    a = gets
+    a = gets.to_f
 
     print 'Введите длинну b:'
-
-    b = gets
+    b = gets.to_f
 
     print 'Введите длинну c:'
+    c = gets.to_f
 
-    c = gets
-
-    new(a, b, c).type
+    new(a, b, c)
   end
 
   def initialize(a, b, c)
-    sides = [a, b, c].map(& :to_f).sort!
+    sides = [a, b, c].sort!
     @a, @b, @c = *sides
     @type = []
-  end
-
-  def right_tringle?
-    @type << 'прямоугольный' if a**2 + b**2 == c**2
-  end
-
-  def isosceles_triangle?
-    @type << 'равнобедренный' if a == b || b == c || c == a
-  end
-
-  def eqilateral_triangle?
-    @type << 'равносторонний' if a == b && b == c
-  end
-
-  def impossible_triangle?
-    @type << 'вырожденный' unless a + b >= c && c + b >= a && a + c >= b
+    type
   end
 
   def type
-    report = 'Треугольник'
     if impossible_triangle?
-
-    elsif isosceles_triangle? && eqilateral_triangle?
-
-    elsif right_tringle?
-
+      @type << 'вырожденный'
+    elsif eqilateral_triangle?
+      @type = %w[равнобедренный равносторонний]
+    elsif isosceles_triangle?
+      @type << 'равнобедренный'
+    elsif right_triangle?
+      @type << 'прямоугольный'
     elsif @type.empty?
       @type << 'неравносторонний'
     end
+    report
+  end
 
+  private
+
+  def right_triangle?
+    a**2 + b**2 == c**2
+  end
+
+  def isosceles_triangle?
+    a == b || b == c || c == a
+  end
+
+  def eqilateral_triangle?
+    a == b && b == c
+  end
+
+  def impossible_triangle?
+    a + b <= c || c + b <= a || a + c <= b
+  end
+
+  def report
+    report = 'Треугольник'
     if @type.length == 2
-
       print "#{report} #{@type[0]} и #{@type[1]}."
-
     else
-
       print "#{report} #{@type[0]}."
-
     end
   end
 end
