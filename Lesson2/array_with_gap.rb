@@ -6,3 +6,5 @@ def array_with_gap(range, step)
   end
 end
 print array_with_gap(10..100, 5)
+# or
+print (10..100).step(5).to_a
