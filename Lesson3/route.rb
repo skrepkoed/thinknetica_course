@@ -12,7 +12,7 @@ class Route
   end
 
   def remove_transitional_station(station)
-    if station.current_trains.values.flatten.select { |train| train.route == self }.empty?
+    if station.current_trains.select { |train| train.route == self }.empty?
       transitional_stations.delete(station)
     else
       puts 'You can`t remove station from the route if it`s current train`s station.'
@@ -20,10 +20,6 @@ class Route
   end
 
   def report_stations
-    puts first_station
-    transitional_stations.each do |station|
-      puts station
-    end
-    puts last_station
+    [first_station, *transitional_stations, last_station].each { |station| puts station.to_s }
   end
 end
