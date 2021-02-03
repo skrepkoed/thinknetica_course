@@ -1,7 +1,6 @@
 require './train'
 require './route'
 require './station'
-require 'pry'
 train = Train.new(132_324, :cargo, 5)
 station1 = Station.new('First')
 station2 = Station.new('Second')

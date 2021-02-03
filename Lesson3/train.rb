@@ -30,7 +30,6 @@ class Train
     @route = route
     self.current_station = route.first_station
     move(current_station)
-    next_station
   end
 
   def to_s
@@ -46,51 +45,41 @@ class Train
   end
 
   def move_forward
-    next_station
-    if @current_station == @route.last_station
-      puts 'This is the last station on the route.'
-    else
-      move(next_station)
-    end
+    next_station ? move(next_station) : (puts 'This is the last station on the route.')
     report_location
   end
 
   def move_back
-    previous_station
-    if @current_station == @route.first_station
-      puts 'This is the first station on the route.'
-    else
-      move(previous_station)
-    end
+    previous_station ? move(previous_station) : (puts 'This is the first station on the route.')
     report_location
   end
 
   def previous_station
-    @previous_station = if station_number.nil? && next_station.nil? && route.transitional_stations.empty?
-                          route.first_station
-                        elsif station_number.nil? && next_station.nil?
-                          route.transitional_stations.last
-                        elsif station_number.nil? && current_station == route.first_station
-                          nil
-                        elsif station_number.zero?
-                          route.first_station
-                        else
-                          route.transitional_stations[station_number - 1]
-                        end
+    if station_number.nil? && next_station.nil? && route.transitional_stations.empty?
+      route.first_station
+    elsif station_number.nil? && next_station.nil?
+      route.transitional_stations.last
+    elsif station_number.nil? && current_station == route.first_station
+      nil
+    elsif station_number.zero?
+      route.first_station
+    else
+      route.transitional_stations[station_number - 1]
+    end
   end
 
   def next_station
-    @next_station = if station_number.nil? && current_station == route.first_station && route.transitional_stations.empty?
-                      route.last_station
-                    elsif station_number.nil? && current_station == route.first_station
-                      route.transitional_stations.first
-                    elsif current_station == route.transitional_stations.last
-                      route.last_station
-                    elsif station_number.nil? && current_station == route.last_station
-                      nil
-                    else
-                      route.transitional_stations[station_number + 1]
-                    end
+    if station_number.nil? && current_station == route.first_station && route.transitional_stations.empty?
+      route.last_station
+    elsif station_number.nil? && current_station == route.first_station
+      route.transitional_stations.first
+    elsif current_station == route.transitional_stations.last
+      route.last_station
+    elsif station_number.nil? && current_station == route.last_station
+      nil
+    else
+      route.transitional_stations[station_number + 1]
+    end
   end
 
   private
@@ -105,11 +94,9 @@ class Train
     current_station.departure_train(self)
     destination_station.recieve_train(self)
     self.current_station = destination_station
-    next_station
-    previous_station
   end
 
   def station_number
-    @station_number = route.transitional_stations.index(current_station)
+    route.transitional_stations.index(current_station)
   end
 end
