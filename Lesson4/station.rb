@@ -28,6 +28,6 @@ class Station
   end
 
   def to_s
-    "#{name}, #{report_current_trains}"
+    name.to_s
   end
 end

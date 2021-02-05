@@ -1,8 +1,9 @@
+require_relative 'carriage'
 class CargoCarriage < Carriage
-  attr_accessor :bearing_capacity
+  attr_reader :bearing_capacity
 
   def initialize(bearing_capacity = standart_capacity)
-    @cargo = Hash.new { |cargo, cargo_type| cargo[cargo_type] = [] }
+    @cargo = []
     @type = :cargo
     @bearing_capacity = bearing_capacity
   end

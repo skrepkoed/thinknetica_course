@@ -1,8 +1,9 @@
+require_relative 'carriage'
 class PassengerCarriage < Carriage
   attr_reader :seats
 
-  COMFORT_CLASSES = %i[economy standart lux]
-  def initialize(comfort_class = standrart_class, seats = standrart_seats)
+  COMFORT_TYPES = %i[economy standart lux]
+  def initialize(comfort_class = standrart_type, seats = standrart_seats)
     @comfort_class = comfort_class
     @type = :passenger
     @seats = seats
@@ -12,7 +13,7 @@ class PassengerCarriage < Carriage
     50
   end
 
-  def standart_class
-    COMFORT_CLASSES[1]
+  def standart_type
+    COMFORT_TYPES[1]
   end
 end

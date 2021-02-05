@@ -18,7 +18,7 @@ class Train
   end
 
   def attach_carriage(carriage)
-    if allow_attach_carriage(carriage)
+    if allow_attach_carriage?(carriage)
       carriage.current_train = self
       carriages << carriage
     end
@@ -84,16 +84,23 @@ class Train
     end
   end
 
-  private
+  protected
 
+  # Следующие методы должны быть protected, так как предназначены для внутреннего использования внутри классов,
+  # наследующих классу Train
   attr_writer :current_station, :speed
-
+  # Нельзя произвольно устанавливать текущую станцию и скорость, для изменения текущей станции предусмотренны
+  # методы движения, для изменения скорости - методы ускорения и остановки
   attr_reader :carriages
 
+  # В ТЗ нет метода для отображения вагонов пренадлежащих поезду, однако данный метод используется для изменения количества
+  # вагонов в поезде
   def moving?
     speed.positive?
   end
 
+  # Данный метод мог бы и не быть защищенным, но так как используется для проверки возможности отцепления/прицепления
+  # вагона, то метод помещен в протектед
   def move(destination_station)
     current_station.departure_train(self)
     destination_station.recieve_train(self)
@@ -104,6 +111,7 @@ class Train
     route.transitional_stations.index(current_station)
   end
 
+  # move и station_number используютяся движения поезда, инкапсулируя реализацию движения
   def allow_attach_carriage?(carriage)
     same_carriage_type?(carriage) && !carriage.current_train && !moving?
   end
@@ -111,4 +119,6 @@ class Train
   def same_carriage_type?(carriage)
     type == carriage.type
   end
+  # Последние два метода используются в проверке правильности типа при присоединении вагона к поезду, и не имеют
+  # смысла вне этого метода
 end
