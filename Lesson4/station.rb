@@ -1,7 +1,7 @@
+
 class Station
   attr_accessor :name
   attr_reader :current_trains
-
   def initialize(name)
     @name = name
     @current_trains = []
@@ -30,4 +30,5 @@ class Station
   def to_s
     name.to_s
   end
+
 end

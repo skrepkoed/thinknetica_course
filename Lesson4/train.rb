@@ -1,7 +1,6 @@
 class Train
   attr_accessor :number
-
-  attr_reader :type, :speed, :current_station, :route
+  attr_reader :type, :speed, :current_station, :route , :carriages
 
   def initialize(number)
     @number = number
@@ -22,10 +21,16 @@ class Train
       carriage.current_train = self
       carriages << carriage
     end
+    if carriages.last==carriage
+      puts "Carriage #{carriage} attached to #{self}"
+    else
+      puts 'Something wrong.'
+    end
   end
 
   def detach_carriage(carriage)
     carriages.delete(carriage) unless moving?
+    puts "Carriage #{carriage} dettached from #{self}"
   end
 
   def route=(route)
@@ -34,9 +39,7 @@ class Train
     move(current_station)
   end
 
-  def to_s
-    "number: #{number}, type: #{type}"
-  end
+  
 
   def report_location
     puts "Train: #{self}"
@@ -54,6 +57,10 @@ class Train
   def move_back
     previous_station ? move(previous_station) : (puts 'This is the first station on the route.')
     report_location
+  end
+
+  def to_s
+      "number: #{number}, type: #{type}"
   end
 
   def previous_station
@@ -83,18 +90,16 @@ class Train
       route.transitional_stations[station_number + 1]
     end
   end
-
-  protected
-
+protected
   # Следующие методы должны быть protected, так как предназначены для внутреннего использования внутри классов,
   # наследующих классу Train
   attr_writer :current_station, :speed
   # Нельзя произвольно устанавливать текущую станцию и скорость, для изменения текущей станции предусмотренны
   # методы движения, для изменения скорости - методы ускорения и остановки
-  attr_reader :carriages
 
   # В ТЗ нет метода для отображения вагонов пренадлежащих поезду, однако данный метод используется для изменения количества
   # вагонов в поезде
+
   def moving?
     speed.positive?
   end

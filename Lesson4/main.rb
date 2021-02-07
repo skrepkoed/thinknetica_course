@@ -1,35 +1,27 @@
-require_relative 'passenger_train'
-require_relative 'cargo_train'
-require_relative 'cargo_carriage'
-require_relative 'passenger_carriage'
-require_relative 'station'
-require_relative 'route'
-
+ require_relative'cargo_train'
+ require_relative'passenger_train'
+ require_relative 'cargo_carriage'
+ require_relative 'passenger_carriage'
+ require_relative'station'
+ require_relative'route'
+ 
 class Railway
-  attr_accessor :trains, :stations, :routes, :carriages
+  def self.session
+    new
+    puts 'Goodbye!'
+  end
 
-  TRAIN_TYPES = [PassengerTrain, CargoTrain]
   def initialize
     @trains = []
     @stations = []
     @routes = []
     @carriages = []
-
-    refresh = lambda do |action|
-      clear_screen
-      action
-      back_from_action(binding)
-    end
-    session
+    start_session
   end
 
-  def session
-    loop do
-      clear_screen
-      main_menu
-      back_from_action(binding, 'from Railway programm session.')
-    end
-  end
+private
+  
+  attr_reader :trains, :stations, :routes, :carriages
 
   def main_menu
     info = { 'Create station' => :create_station, 'Create train' => :create_train,
@@ -43,15 +35,16 @@ class Railway
   end
 
   def create_station
+    
     puts 'Please enter name of the station:'
     station_name = gets.chomp
     stations << Station.new(station_name)
-    puts "Station #{stations.last} created!"
+    puts "Station #{stations.last.to_s} created!"
   end
 
   def create_train
     puts 'Please choose train`s type'
-    train_type = menu_list(TRAIN_TYPES)
+    train_type = menu_list( [PassengerTrain, CargoTrain])
     puts 'Please enter train`s number'
     train_number = gets.to_i
     trains << train_type.new(train_number)
@@ -83,9 +76,11 @@ class Railway
   end
 
   def change_route
-    stages = ['Please choose the route:', 'Please choose what you want to do with the route:']
-    options = { 'Remove station from the route' => :remove_station, 'Add station to the route' => :add_station }
-    options_list(stages, options, routes)
+
+      stages = ['Please choose the route:', 'Please choose what you want to do with the route:']
+      options = { 'Remove station from the route' => :remove_station, 'Add station to the route' => :add_station }
+      options_list(stages, options, routes)
+    
   end
 
   def change_carriage_set
@@ -98,7 +93,7 @@ class Railway
       create_train
       change_carriage_set
     else
-      stages = ['Please choose the train:', 'Please choose what you want to do with the route:']
+      stages = ['Please choose the train:', 'Please choose what you want to do with the carriage:']
       options = { 'Add carriage to train' => :attach_carriage, 'Remove carriage from train' => :detach_carriage }
       options_list(stages, options, trains)
     end
@@ -116,9 +111,13 @@ class Railway
     else
       puts 'Please, choose the train:'
       train = menu_list(trains)
-      puts 'Please, choose the route:'
-      route = menu_list(routes)
-      train.route = route
+      unless train.route
+        puts 'Please, choose the route:'
+        route = menu_list(routes)
+        train.route = route
+      else
+        puts 'Train already has route.'
+      end
     end
   end
 
@@ -140,8 +139,6 @@ class Railway
     station.report_current_trains
   end
 
-  private
-
   # Следующие методы не планируется (и невозможно) использовать откуда то извне класса Railway, поэтому они помещены в private
   # Методы move_train_forward,move_train_back,detach_carriage,attach_carriage,remove_station,add_station,create_passenger_carriage
   # и create_cargo_carriage позволяют выбирать из различных опций при создании как либо модели(поезд, вагон и.т.д.)
@@ -156,9 +153,13 @@ class Railway
   end
 
   def detach_carriage(train)
-    puts 'Please choose train`s carriage:'
-    carriage = menu_list(train.carriages)
-    train.detach_carriage carriage
+    unless train.carriages.empty?
+      puts 'Please choose train`s carriage:'
+      carriage = menu_list(train.carriages)
+      train.detach_carriage carriage
+    else
+      puts 'Nothing to detach.'
+    end
   end
 
   def attach_carriage(train)
@@ -168,15 +169,26 @@ class Railway
   end
 
   def remove_station(route)
-    puts 'Please, choose station:'
-    station = menu_list(route.transitional_stations)
-    route.remove_transitional_station(station)
+    if route.transitional_stations.empty?
+      puts 'Nothing to remove'
+    else
+      puts 'Please, choose station:'
+      station = menu_list(route.transitional_stations)
+      route.remove_transitional_station(station)
+    end
   end
 
   def add_station(route)
-    puts 'Please, choose station:'
-    station = menu_list(stations)
-    route.add_transitional_station station
+
+    if available_stations(route).size<1
+      puts 'There is not enough stations,to change the route. Please create station.'
+      create_station
+      add_station route
+      else
+      puts 'Please, choose station:'
+      station = menu_list(available_stations(route))
+      route.add_transitional_station station
+    end
   end
 
   def create_passenger_carriage
@@ -193,12 +205,21 @@ class Railway
     CargoCarriage.new(bearing_capacity)
   end
 
+  def available_stations(route)
+    stations.reject{|station| station==route.first_station||station==route.last_station}
+  end
+
   def menu_list(options)
     option_number = (1..options.size)
     option_number.each do |number|
       puts "#{number}.  #{options[number - 1]}"
     end
-    options[gets.to_i - 1]
+    if option_number.include? choice=gets.to_i
+      options[choice - 1]
+    else
+      puts 'Try again.'
+      menu_list(options)
+    end
   end
 
   def options_list(stages, options, entities = [])
@@ -213,6 +234,14 @@ class Railway
     arguments << options[menu_list(options.keys)]
 
     perform.call(*arguments.reverse)
+  end
+
+  def start_session
+      loop do
+        clear_screen
+        main_menu
+        back_from_action(binding, 'from Railway programm session.')
+      end
   end
 
   def back_from_action(current_closure = binding, notice = 'main menu.')
