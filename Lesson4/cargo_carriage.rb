@@ -8,10 +8,8 @@ class CargoCarriage < Carriage
     @bearing_capacity = bearing_capacity
   end
 
-  def to_s
-  	"Type:#{type}, with bearing capacity: #{bearing_capacity}"
-  end
-protected
+  protected
+
   def standrart_capacity
     500
   end

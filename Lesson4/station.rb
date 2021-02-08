@@ -1,7 +1,7 @@
-
 class Station
   attr_accessor :name
   attr_reader :current_trains
+
   def initialize(name)
     @name = name
     @current_trains = []
@@ -15,20 +15,7 @@ class Station
     current_trains.delete(train)
   end
 
-  def report_current_trains
-    puts "There are #{current_trains.size} train(s) on station #{name}"
-    current_trains.each { |train| puts train.to_s }
-    nil
-  end
-
   def report_trains_by_type(type)
-    trains = current_trains.select { |train| train.type == type }
-    puts "There are #{trains.size} train(s) of #{type} type on station #{name}:"
-    trains.each { |train| puts train.to_s } unless trains.empty?
+    current_trains.select { |train| train.type == type }
   end
-
-  def to_s
-    name.to_s
-  end
-
 end
