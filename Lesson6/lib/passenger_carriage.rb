@@ -1,0 +1,23 @@
+require_relative 'carriage'
+class PassengerCarriage < Carriage
+  attr_reader :seats, :comfort_class
+
+  prepend TrainCompany
+  COMFORT_TYPES = %i[economy standart lux]
+
+  def initialize(comfort_class = standrart_type, seats = standrart_seats, _train_company)
+    @comfort_class = comfort_class
+    @type = :passenger
+    @seats = seats
+  end
+
+  protected
+
+  def standrart_seats
+    50
+  end
+
+  def standart_type
+    COMFORT_TYPES[1]
+  end
+end
