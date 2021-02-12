@@ -1,6 +1,6 @@
-require_relative '../modules/train_company'
-require_relative '../modules/instance_counter'
-require_relative '../modules/validation_module'
+require_relative 'train_company'
+require_relative 'instance_counter'
+require_relative 'validation_module'
 class Train
   attr_accessor :number
   attr_reader :type, :speed, :current_station, :route, :carriages
@@ -92,7 +92,15 @@ class Train
 
   protected
 
+  # Следующие методы должны быть protected, так как предназначены для внутреннего использования внутри классов,
+  # наследующих классу Train
   attr_writer :current_station, :speed
+
+  # Нельзя произвольно устанавливать текущую станцию и скорость, для изменения текущей станции предусмотренны
+  # методы движения, для изменения скорости - методы ускорения и остановки
+
+  # В ТЗ нет метода для отображения вагонов пренадлежащих поезду, однако данный метод используется для изменения количества
+  # вагонов в поезде
 
   def moving?
     speed.positive?
