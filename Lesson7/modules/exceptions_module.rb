@@ -63,6 +63,14 @@ module ExceptionsModule
     end
   end
 
+  module CargoCarriageExceptions
+    class InsufficientCapacityAmount < RuntimeError
+      def message(carriage)
+        "There are not enough capacity in carriage #{carriage}"
+      end
+    end
+  end
+
   module PassengerTrainExceptions
     class SeatsExcess < RuntimeError
       def message(_total_seats)
@@ -93,12 +101,6 @@ module ExceptionsModule
     class InsufficientSeatsAmount < RuntimeError
       def message(carriage)
         "There are not enough seats in carriage #{carriage}."
-      end
-    end
-
-    class InsufficientCapacityAmount < RuntimeError
-      def message(carriage)
-        "There are not enough capacity in carriage #{carriage}"
       end
     end
   end

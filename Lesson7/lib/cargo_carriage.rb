@@ -3,6 +3,7 @@ class CargoCarriage < Carriage
   attr_reader :bearing_capacity, :free_capacity, :occupied_capacity
 
   prepend TrainCompany
+  include Validations::CargoCarriageValidations
   def initialize(bearing_capacity = standart_capacity, _train_company)
     super
     @cargo = []
@@ -13,8 +14,15 @@ class CargoCarriage < Carriage
   end
 
   def load_cargo(cargo_volume)
+    validate_capacity(free_capacity, cargo_volume)
     self.free_capacity -= cargo_volume
     self.occupied_capacity += cargo_volume
+  end
+
+  def unload_cargo(cargo_volume)
+    validate_capacity(occupied_capacity, cargo_volume)
+    self.free_capacity += cargo_volume
+    self.occupied_capacity -= cargo_volume
   end
 
   protected

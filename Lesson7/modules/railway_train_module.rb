@@ -1,4 +1,3 @@
-require 'pry'
 module RailwayTrain
   include Validations::TrainValidations
   include ExceptionsModule::RailwayExceptions
@@ -64,26 +63,26 @@ module RailwayTrain
   end
 
   def attach_carriage(train)
-    current_available_carriages = available_carriages
     if available_carriages?
-      puts 'Please choose carriage:'
-      carriage = menu_list(current_available_carriages, report_carriage)
-      train.attach_carriage carriage
       begin
+        current_available_carriages = available_carriages
+        puts 'Please choose carriage:'
+        carriage = menu_list(current_available_carriages, report_carriage)
+        train.attach_carriage carriage
       rescue FalliedCarriageAttachment => e
-        puts e.message train
+        puts e.message report_carriage.call carriage
         create_carriage
         retry
       else
         puts "Carriage #{report_carriage.call carriage} attached to train #{report_train.call train}"
       end
     else
-      raise InsufficientCarriagesAmount
       begin
+        raise InsufficientCarriagesAmount
       rescue InsufficientCarriagesAmount => e
         e.message
         create_carriage
-        retry
+        attach_carriage train
       end
     end
   end
@@ -113,79 +112,11 @@ module RailwayTrain
     report_location(train)
   end
 
-  def passenger_seats_control
-    stages = ['Please choose the train:', 'Please choose what you want to do:']
-    options = { 'Take a seat on train' => :take_train_seat, 'Get off the train' => :get_off_train }
-    options_list(stages, options, trains.select { |train| train.type == :passenger }, report_train)
-  end
-
-  def train_seat(train)
-    stages = ['Choose cariage comfort type:']
-    options = train.carriages.map(&:comfort_class).uniq
-    option = menu_list(options)
-    puts 'Choose carriage number'
-    menu_list(train.carriages.select { |train| train.comfort_class == option }, :number)
-  end
-
-  def take_train_seat(train)
-    carriage = train_seat(train)
-    if enough_seats?(carriage)
-      carriage.take_seat
-      puts "You have taken a seat on #{carriage.comfort_class} carriage, on train #{train.number}"
-    else
-      puts InsufficientSeatsAmount.message carriage
-    end
-  end
-
-  def get_off_train(train)
-    carriage = train_seat(train)
-    if empty_passenger_carriage?(carriage)
-      puts 'Empty carriage.'
-    else
-      carriage.get_off
-      puts "You have gotten off  #{carriage.comfort_class} carriage, on train #{train.number}"
-    end
-  end
-
-  def cargo_volume_controll
-    stages = ['Please choose the train:', 'Please choose what you want to do:']
-    options = { 'Load cargo' => :load_cargo, 'Unload cargo' => :unload_cargo }
-    options_list(stages, options, trains.select { |train| train.type == :cargo }, report_train)
-  end
-
-  def change_cargo_volume(train)
-    puts 'Choose carriage'
-    carriage = menu_list(train.carriages, :number)
-    puts 'How much you want to (un)load?'
-    cargo = gets.to_f
-    [cargo, carriage]
-  end
-
-  def load_cargo(train)
-    options = change_cargo_volume(train)
-    if enough_capacity?(*options)
-      options.last.load_cargo(options.first)
-      puts "You have loaded #{options.first} volume of cargo in carriage #{options.last}, #{options.last.free_capacity} volume left."
-    else
-      puts InsufficientCapacityAmount.message(options.last)
-    end
-  end
-
-  def unload_cargo(train)
-    options = change_cargo_volume(train)
-    if empty_cargo_carriage?(options.last)
-      puts 'Empty carriage.'
-    else
-      options.last.unload(options.first)
-      puts "You have unloaded #{options.first} volume of cargo in carriage #{options.last}, #{options.last.free_capacity} volume left."
-    end
-  end
-
   def report_all_trains
     puts 'Please choose the train to get it`s carriage set:'
     train = menu_list(trains, report_train)
     puts 'Carriages:'
-    train.carriages_iteration { |carriage| puts report_carriage.call carriage }
+    train.each_carriage { |carriage| puts report_carriage.call carriage }
   end
 
   def report_train

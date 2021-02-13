@@ -36,7 +36,7 @@ module RailwayStation
     if station.current_trains.empty?
       puts "There are no trains on #{station.name}"
     else
-      station.trains_iteration { |train| puts report_train.call train }
+      station.each_train { |train| puts report_train.call train }
     end
   end
 end

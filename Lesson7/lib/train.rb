@@ -58,14 +58,8 @@ class Train
     move(current_station)
   end
 
-  def carriages_iteration(&block)
-    enumerator=carriages.to_enum
-    loop do 
-      yield enumerator.next 
-    rescue StopIteration
-      break
-    end
-    carriages
+  def each_carriage(&block)
+    carriages.each(&block) if block_given?
   end
 
   def move_forward

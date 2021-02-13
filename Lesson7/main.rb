@@ -20,6 +20,8 @@ class Railway
   include RailwayRoute
   include RailwayStation
   include RailwayCarriage
+
+  CargoLoader = Struct.new(:cargo, :carriage)
   def initialize
     @trains = []
     @stations = []

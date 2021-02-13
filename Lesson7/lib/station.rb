@@ -34,14 +34,8 @@ class Station
     current_trains.select { |train| train.type == type }
   end
 
-  def trains_iteration(&block)
-    enumerator=current_trains.to_enum
-    loop do 
-      yield enumerator.next 
-    rescue StopIteration
-      break
-    end
-    current_trains
+  def each_train(&block)
+    current_trains.each(&block) if block_given?
   end
 
   def ==(other)

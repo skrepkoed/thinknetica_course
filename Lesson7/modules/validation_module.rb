@@ -27,6 +27,18 @@ module Validations
 
   module TrainValidations
     include ExceptionsModule::TrainExceptions
+    include ExceptionsModule::RailwayExceptions
+
+    def has_carriage?
+      validate_carriage_presence
+      true
+    rescue StandardError
+      false
+    end
+
+    def validate_carriage_presence
+      raise InsufficientCarriagesAmount if carriages.empty?
+    end
 
     private
 
@@ -98,6 +110,28 @@ module Validations
     end
   end
 
+  module CargoCarriageValidations
+    include ExceptionsModule::CargoCarriageExceptions
+    def enough_capacity?(capacity, cargo)
+      validate_capacity(capacity,  cargo)
+      true
+    rescue InsufficientCapacityAmount
+      false
+    end
+
+    def empty_cargo_carriage?
+      if occupied_capacity.zero?
+        true
+      else
+        false
+      end
+    end
+
+    def validate_capacity(capacity, cargo)
+      raise InsufficientCapacityAmount unless capacity >= cargo
+    end
+  end
+
   module RailwayValidations
     include ExceptionsModule::RailwayExceptions
 
@@ -129,18 +163,6 @@ module Validations
 
     def empty_passenger_carriage?(carriage)
       if carriage.occupied_seats.zero?
-        true
-      else
-        false
-      end
-    end
-
-    def enough_capacity?(carriage, cargo)
-      carriage.free_capcity >= cargo
-    end
-
-    def empty_cargo_carriage?(carriage)
-      if carriage.occupied_capacity.zero?
         true
       else
         false

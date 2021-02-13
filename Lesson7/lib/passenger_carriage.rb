@@ -5,6 +5,7 @@ class PassengerCarriage < Carriage
 
   prepend TrainCompany
   COMFORT_TYPES = %i[economy standart lux]
+  STANDART_SEATS = 50
 
   def initialize(comfort_class = standrart_type, seats = standrart_seats, _train_company)
     super
@@ -30,7 +31,7 @@ class PassengerCarriage < Carriage
   attr_writer :free_seats, :occupied_seats
 
   def standrart_seats
-    50
+    STANDART_SEATS
   end
 
   def standart_type
