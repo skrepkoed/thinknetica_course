@@ -127,6 +127,8 @@ module Validations
       end
     end
 
+    private
+    
     def validate_capacity(capacity, cargo)
       raise InsufficientCapacityAmount unless capacity >= cargo
     end
